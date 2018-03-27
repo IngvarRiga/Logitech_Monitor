@@ -1,5 +1,6 @@
 # Logitech_Monitor
 Библиотека управления ЧБ монитором клавиатуры Logitech.
+
 Сборка под платформу 4.6
 
 Библиотека предназначена для управления простым выводом текстовой информации на черно-белый монитор клавиатуры Logitech из собственных программ на C#. Является самодостаточной, однако не до конца отлаженной. Также при некоторой доработке может использоваться и для вывода на цветной монитор клавиатур того же производителя.
@@ -9,6 +10,7 @@
 
 Вариант использования:
 
+```C#
 using etisLogitechDisplay;
 ...
 private static void Main(string[] args)
@@ -45,10 +47,11 @@ private static void KeyProcessor(int KeyPressed)
       }
 }
 
-//-------------------
+```
 
 Класс Display:
 
+```C#
 using System;
 using System.Drawing;
 using plgLogitechSDK;
@@ -83,7 +86,6 @@ namespace LogitechDisplay
     /// Класс управления монитором клавиатуры
     /// </summary>
     private static MonitorMONO mon;
-
     /// <summary>
     /// Полотно, на котором отображается информация и потом выводится на экран монитора
     /// </summary>
@@ -247,3 +249,4 @@ namespace LogitechDisplay
     }
   }
 }
+```
