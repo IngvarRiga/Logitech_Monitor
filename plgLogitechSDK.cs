@@ -171,7 +171,6 @@ namespace plgLogitechSDK
     public int pixCnt; //-- количество пикселей в знаке
     public int CharWidth;
     public int[,] rstr;
- //   char[,] tst = new char[8,6];
 
     public CharsSign(Bitmap Src, int CharWd=6, int Pos = 0, int CharH = 8, int CharW = 6)
     {
@@ -191,21 +190,10 @@ namespace plgLogitechSDK
             rstr[pixCnt, 0] = x - Pos;
             rstr[pixCnt, 1] = y;
             pixCnt += 1;
-  //          tst[y, x - Pos] = '*';
           }
- //         else
- //         { tst[y, x - Pos] = ' '; }
         }
       }
-   /*   for (int j = 0; j < 8; j++)
-      {
-        string s = string.Empty;
-        for (int i = 0; i < 6; i++) { s=s+tst[j, i]; }
-        Console.WriteLine(s);
-      }*/
-
     }
-
   }
 
   /// <summary>
@@ -477,40 +465,17 @@ namespace plgLogitechSDK
       }
     }
 
-    /*/// <summary>
-    /// Нативная (медленная) версия копирования растра
-    /// </summary>
-    /// <param name="bmp"></param>
-    /// <returns></returns>
-    public static byte[] BitmapToByteRgbNaive(Bitmap bmp)
-    {
-      int width = bmp.Width,
-          height = bmp.Height;
-      byte[] res = new byte[height * width];
-      for (int y = 0; y < height; y++)
-      {
-        for (int x = 0; x < width; x++)
-        {
-          Color color = bmp.GetPixel(x, y);
-          if ((color.R > 0))
-            SetPixel(res, x, y);
-        }
-      }
-      return res;
-    }
-    */
     /// <summary>
     /// Ускоренная версия копирования растра
     /// </summary>
-    /// <param name="bmp"></param>
-    /// <returns></returns>
+    /// <param name="bmp">Раст, который необходимо скопировать на экран монитора клавиатуры</param>
+    /// <returns>Массив растра для вывода</returns>
     public static unsafe byte[] BitmapToByteRgb(Bitmap bmp)
     {
       int width = bmp.Width,
           height = bmp.Height;
       var res = new byte[height * width];
       var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, bmp.PixelFormat);
-      //PixelFormat.Format24bppRgb);
       try
       {
         byte* curpos;
@@ -530,7 +495,13 @@ namespace plgLogitechSDK
       }
       return res;
     }
-
+    /// <summary>
+    /// Установка пикселя на растре монитора
+    /// </summary>
+    /// <param name="bmp">Массив растра</param>
+    /// <param name="x">Координата X</param>
+    /// <param name="y">Координата Y</param>
+    /// <param name="on">включить / выключить</param>
     private static void SetPixel(byte[] bmp, int x, int y, bool on = true)
     {
       if (on)
@@ -548,10 +519,6 @@ namespace plgLogitechSDK
       if (fActive)
       {
         ClearMonitor();
-        /*for (int i = 0; i < 4; i++)
-        {
-          LogitechMonitor.TextOut(i, MonoStr[i]);
-        }*/
       }
     }
   }
@@ -658,7 +625,7 @@ namespace plgLogitechSDK
       { return null; }
     }
 
- private static void TimerCallBack(object inf)
+    private static void TimerCallBack(object inf)
     {
       if (IsMonitorInit)
       {
@@ -668,13 +635,7 @@ namespace plgLogitechSDK
         if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_3)) KeyProcessorMetod(3);
       }
     }
-    /*
-    public static void ClearScreen(int ID)
-    {
-      SplashBmp = Properties.Resources.cls;
-      LogitechSDK.LogiLcdUpdate(LogitechSDK.LOGI_LCD_TYPE_MONO);
-    }
-    */
+
     public static void DeInitLogitechMonitor()
     {
       if (LogitechSDK.LogiLcdIsConnected(LogitechSDK.LOGI_LCD_TYPE_MONO))
@@ -722,7 +683,6 @@ namespace plgLogitechSDK
           height = bmp.Height;
       var res = new byte[height*width];
       var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, bmp.PixelFormat);
-          //PixelFormat.Format24bppRgb);
       try
       {
         byte* curpos;
@@ -768,10 +728,8 @@ namespace plgLogitechSDK
     /// </summary>
     public static void InitLogitechKeyboard(LogitechKeyProcessor KeyProc)
     {
-      if (KeyProc == null)
-        throw new ArgumentNullException("При инициализации класса LogitechKeyboard необходимо задавать функцию-обработчик.");
       //-- Назначаем внутренней переменной фунекцию обработчик нажатий клавиш
-      keyProcess = KeyProc;
+      keyProcess = KeyProc ?? throw new ArgumentNullException("При инициализации класса LogitechKeyboard необходимо задавать функцию-обработчик.");
       cblnstance = new LogitechGSDK.logiGkeyCB(GkeySDKCallback);
       LogitechGSDK.LogiGkeyInitWithoutContext(cblnstance);
     }
