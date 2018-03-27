@@ -16,14 +16,13 @@ using etisLogitechDisplay;
 private static void Main(string[] args)
 {
     ...
-	//-- 
     Display.Init(Properties.Resources.ETR, KeyProcessor);
- 
+    ... 
     AppContext = new winMainWin();
     Application.Run(AppContext);
     ...
     Display.DeInit();
-	...
+    ...
 }
 
 private static void KeyProcessor(int KeyPressed)
@@ -37,7 +36,7 @@ private static void KeyProcessor(int KeyPressed)
           ...
           break;
         case 2:
-		  ...
+          ...
           break;
         case 3:
           ...
@@ -49,7 +48,7 @@ private static void KeyProcessor(int KeyPressed)
 
 ```
 
-Класс Display:
+Класс Display. Подстраивается по конкретную программу.
 
 ```C#
 using System;
@@ -81,7 +80,6 @@ namespace LogitechDisplay
     /// Наличие в системе станций с инженером
     /// </summary>
     private static bool fIngPresent;
-
     /// <summary>
     /// Класс управления монитором клавиатуры
     /// </summary>
