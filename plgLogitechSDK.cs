@@ -334,7 +334,7 @@ namespace plgLogitechSDK
     public void ClearMonitor()
     {
       //-- очитка, заливка черным цветом
-      fMon = BitmapToByteRgb(fFon);
+      fMon = LogitechMonitor.BitmapToByteRgb(fFon);
     }
 
     /// <summary>
@@ -466,36 +466,6 @@ namespace plgLogitechSDK
     }
 
     /// <summary>
-    /// Ускоренная версия копирования растра
-    /// </summary>
-    /// <param name="bmp">Раст, который необходимо скопировать на экран монитора клавиатуры</param>
-    /// <returns>Массив растра для вывода</returns>
-    public static unsafe byte[] BitmapToByteRgb(Bitmap bmp)
-    {
-      int width = bmp.Width,
-          height = bmp.Height;
-      var res = new byte[height * width];
-      var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, bmp.PixelFormat);
-      try
-      {
-        byte* curpos;
-        for (var h = 0; h < height; h++)
-        {
-          curpos = ((byte*)bd.Scan0) + h * bd.Stride;
-          for (var w = 0; w < width; w++)
-          {
-            if (*(curpos++) > 0) { res[(w + h) + (h * (LogitechSDK.LOGI_LCD_MONO_WIDTH - 1))] = 255; }
-            else { res[(w + h) + (h * (LogitechSDK.LOGI_LCD_MONO_WIDTH - 1))] = 0; }
-          }
-        }
-      }
-      finally
-      {
-        bmp.UnlockBits(bd);
-      }
-      return res;
-    }
-    /// <summary>
     /// Установка пикселя на растре монитора
     /// </summary>
     /// <param name="bmp">Массив растра</param>
@@ -523,7 +493,10 @@ namespace plgLogitechSDK
     }
   }
 
-  //-- класс управляющий отображением дополнительной информации на мониторе клавиатуры
+  /// <summary>
+  /// Класс управляющий отображением дополнительной информации на мониторе клавиатуры. Не доработан до конца, в частности не реализован
+  /// механизм управления логическими мониторами. 
+  /// </summary>
   public static class LogitechMonitor
   {
     //-- набор логических мониторов
@@ -537,20 +510,7 @@ namespace plgLogitechSDK
     /// Признак того, что физический экран уже активизирован. По умолчанию, до вызова функции <seealso cref="InitLogitechMonitor"/> равен False
     /// </summary>
     public static bool IsMonitorInit = false;
-    /// <summary>
-    /// Вывести текст на экран. Убожеская версия вывода. Просто выводит текст на экран.
-    /// При использовании логических мониторов будет перетирать изображение.
-    /// </summary>
-    /// <param name="str">Строка 0-3</param>
-    /// <param name="text">Текст для вывода</param>
-    public static void TextOut(int str, string text)
-    {
-      if (IsMonitorInit)
-      {
-        LogitechSDK.LogiLcdMonoSetText(str, text);
-        LogitechSDK.LogiLcdUpdate(LogitechSDK.LOGI_LCD_TYPE_MONO);
-      }
-    }
+
     /// <summary>
     /// Очистка физического монитора
     /// </summary>
@@ -563,7 +523,7 @@ namespace plgLogitechSDK
         {
           try
           {
-            LogitechSDK.LogiLcdMonoSetBackground(BitmapToByteRgbNaive(SplashBmp));
+            LogitechSDK.LogiLcdMonoSetBackground(BitmapToByteRgb(SplashBmp));
             LogitechSDK.LogiLcdUpdate(LogitechSDK.LOGI_LCD_TYPE_MONO);
           }
           catch (Exception e)
@@ -574,9 +534,9 @@ namespace plgLogitechSDK
     }
 
     /// <summary>
-    /// Инициализация физического монитора. Автоматически создается логический монитор с именем MAIN
+    /// Инициализация физического монитора. Автоматически создается логический монитор с именем MAIN (последнее не реализовано)
     /// </summary>
-    /// <param name="Spl">Splash изображение, выводимое при инициализации монитора. Если не задано, то монитор просто очищается.</param>
+    /// <param name="Spl">Splash-изображение, выводимое при инициализации монитора. Если не задано, то монитор просто очищается.</param>
     /// <param name="KeyProcessor">Ссылка на метод - процессор, обрабатывающий нажатия клавиш на мониторе клавиатуры</param>
     /// <returns>"Истина" в случае успешной инициализации.</returns>
     public static bool InitLogitechMonitor(Bitmap Spl=null, LogitechLCDKeyProcessor KeyProcessor=null)
@@ -585,7 +545,7 @@ namespace plgLogitechSDK
       //-- если растр не задан - используем очистку
       if (Spl == null) { SplashBmp = Properties.Resources.cls; }
       else { SplashBmp = Spl; }
-      //-- установка процессора
+      //-- установка процессора, если он не задан, (по умолчанию), то и эффекта не будет
       KeyProcessorMetod = KeyProcessor;
       IsMonitorInit = TryInitLogitechMonitor();
       //-- если монитор вообще подсоединен, то ..
@@ -616,8 +576,8 @@ namespace plgLogitechSDK
     /// <summary>
     /// Получить логический монитор по имени
     /// </summary>
-    /// <param name="Name"></param>
-    /// <returns></returns>
+    /// <param name="Name">Имя логического монитора</param>
+    /// <returns>Ссылка на логический монитор</returns>
     public static MonitorMONO GetMonitorByName(string Name)
     {
       if (MMS.ContainsKey(Name)) { return MMS[Name]; }
@@ -629,18 +589,45 @@ namespace plgLogitechSDK
     {
       if (IsMonitorInit)
       {
-        if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_0)) KeyProcessorMetod(0);
-        if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_1)) KeyProcessorMetod(1);
-        if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_2)) KeyProcessorMetod(2);
-        if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_3)) KeyProcessorMetod(3);
+        //-- только если задан обработчик событий нажатия клавиш
+        if (KeyProcessorMetod != null)
+        {
+          if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_0)) KeyProcessorMetod(0);
+          if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_1)) KeyProcessorMetod(1);
+          if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_2)) KeyProcessorMetod(2);
+          if (LogitechSDK.LogiLcdIsButtonPressed(LogitechSDK.LOGI_LCD_MONO_BUTTON_3)) KeyProcessorMetod(3);
+        }
       }
     }
 
     public static void DeInitLogitechMonitor()
     {
+      //-- удаление таймера
+      lcdButtonsTimer.Dispose();
       if (LogitechSDK.LogiLcdIsConnected(LogitechSDK.LOGI_LCD_TYPE_MONO))
       {
+        IsMonitorInit = false;
         LogitechSDK.LogiLcdShutdown();
+      }
+    }
+
+    /// <summary>
+    /// Отображение битовой матрицы на экране монитора
+    /// </summary>
+    /// <param name="View"></param>
+    public static void Paint(byte[] View)
+    {
+      if (IsMonitorInit)
+      {
+        try
+        {
+          LogitechSDK.LogiLcdMonoSetBackground(View);
+          LogitechSDK.LogiLcdUpdate(LogitechSDK.LOGI_LCD_TYPE_MONO);
+        }
+        catch (Exception e)
+        {
+          //throw;
+        }
       }
     }
 
@@ -651,32 +638,10 @@ namespace plgLogitechSDK
     }
 
     /// <summary>
-    /// Нативная (медленная) версия копирования растра
-    /// </summary>
-    /// <param name="bmp"></param>
-    /// <returns></returns>
-    public static byte[] BitmapToByteRgbNaive(Bitmap bmp)
-    {
-      int width = bmp.Width,
-          height = bmp.Height;
-      var res = new byte[height*width];
-      for (var y = 0; y<height; y++)
-      {
-        for (var x = 0; x<width; x++)
-        {
-          var color = bmp.GetPixel(x, y);
-          if ((color.R>0))
-            SetPixel(res, x, y);
-        }
-      }
-      return res;
-    }
-
-    /// <summary>
     /// Ускоренная версия копирования растра
     /// </summary>
-    /// <param name="bmp"></param>
-    /// <returns></returns>
+    /// <param name="bmp">Объект Bitmap , который требуется скопировать в растр</param>
+    /// <returns>Байтовый массив данных, подготовленный к выводу на экран клавиатуры</returns>
     public static unsafe byte[] BitmapToByteRgb(Bitmap bmp)
     {
       int width = bmp.Width,
@@ -702,19 +667,6 @@ namespace plgLogitechSDK
       }
       return res;
     }
-
-    private static void SetPixel(byte[] bmp, int x, int y, bool on=true)
-    {
-      if (on)
-      {
-        bmp[(x+y)+(y*(LogitechSDK.LOGI_LCD_MONO_WIDTH-1))]=255;
-      }
-      else
-      {
-        bmp[(x+y)+(y*(LogitechSDK.LOGI_LCD_MONO_WIDTH-1))]=0;
-      }
-    }
-
   }
 
   /// <summary>
