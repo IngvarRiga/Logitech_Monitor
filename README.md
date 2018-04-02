@@ -7,8 +7,16 @@
 
 Никаких ограничений по использованию - берите и дорабатывайте кому надо.
 
+#### h4 История изменений
 
-Вариант использования:
+02.04.2018
+ + оптимизация функций
+ + очистка мусора
+ + корректное завершение работы (я надеюсь)
+
+
+
+#### h4 Вариант использования:
 
 ```C#
 using etisLogitechDisplay;
@@ -212,15 +220,7 @@ namespace LogitechDisplay
       var posTime = 161 - mon.GetStringLengthPost("00:00:00");
       mon.TextOutPost(ref View, posTime, 0, DateTime.Now.TimeOfDay.ToString("hh\\:mm\\:ss"));
       //-- Перенос сформированного изображения на экран монитора клавиатуры
-      try
-      {
-        LogitechSDK.LogiLcdMonoSetBackground(View);
-        LogitechSDK.LogiLcdUpdate(LogitechSDK.LOGI_LCD_TYPE_MONO);
-      }
-      catch (Exception e)
-      {
-      }
-
+      LogitechMonitor.Paint(View);
     }
 
     private static void StartMonitor()
