@@ -78,16 +78,16 @@ namespace plgLogitechSDK
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void logiGkeyCB(GkeyCode gkeyCode, [MarshalAs(UnmanagedType.LPWStr)] String gkeyOrButtonString, IntPtr context); // ??
 
-    [DllImport("LogitechGkeyEnginesWrapper ", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("LogitechGkeyEnginesWrapper.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
     public static extern int LogiGkeyInitWithoutCallback();
 
-    [DllImport("LogitechGkeyEnginesWrapper ", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("LogitechGkeyEnginesWrapper.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
     public static extern int LogiGkeyInitWithoutContext(logiGkeyCB gkeyCB);
 
-    [DllImport("LogitechGkeyEnginesWrapper ", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("LogitechGkeyEnginesWrapper.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
     public static extern int LogiGkeyIsMouseButtonPressed(int buttonNumber);
 
-    [DllImport("LogitechGkeyEnginesWrapper ", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("LogitechGkeyEnginesWrapper.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr LogiGkeyGetMouseButtonString(int buttonNumber);
 
     public static String LogiGkeyGetMouseButtonStr(int buttonNumber)
@@ -96,10 +96,10 @@ namespace plgLogitechSDK
       return str;
     }
 
-    [DllImport("LogitechGkeyEnginesWrapper ", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("LogitechGkeyEnginesWrapper.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
     public static extern int LogiGkeyIsKeyboardGkeyPressed(int gkeyNumber, int modeNumber);
 
-    [DllImport("LogitechGkeyEnginesWrapper ")]
+    [DllImport("LogitechGkeyEnginesWrapper.dll")]
     private static extern IntPtr LogiGkeyGetKeyboardGkeyString(int gkeyNumber, int modeNumber);
 
     public static String LogiGkeyGetKeyboardGkeyStr(int gkeyNumber, int modeNumber)
@@ -108,7 +108,7 @@ namespace plgLogitechSDK
       return str;
     }
 
-    [DllImport("LogitechGkeyEnginesWrapper ", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("LogitechGkeyEnginesWrapper.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
     public static extern void LogiGkeyShutdown();
 
   }
@@ -140,25 +140,25 @@ namespace plgLogitechSDK
     public const int LOGI_LCD_TYPE_MONO = (0x00000001);
     public const int LOGI_LCD_TYPE_COLOR = (0x00000002);
 
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdInit(String friendlyName, int lcdType);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdIsConnected(int lcdType);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdIsButtonPressed(int button);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdUpdate(int lcdType);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdShutdown();
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdMonoSetBackground(byte[] monoBitmap);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdMonoSetText(int lineNumber, String text);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdColorSetBackground(byte[] colorBitmap);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdColorSetTitle(String text, int red, int green, int blue);
-    [DllImport("LogitechLcdEnginesWrapper", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
+    [DllImport("LogitechLcdEnginesWrapper.dll", CharSet=CharSet.Unicode, CallingConvention=CallingConvention.Cdecl)]
     public static extern bool LogiLcdColorSetText(int lineNumber, String text, int red, int green, int blue);
 
   }
